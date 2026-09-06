@@ -9,6 +9,12 @@ Releases are cut as git tags; see [RELEASING.md](RELEASING.md).
 
 ## [Unreleased]
 
+### Added
+
+- `RELEASING.md` now documents how work reaches a release: the trunk-based branching
+  model, where changelog entries are written, how to choose the version number, and why a
+  release branch is a chore branch rather than a stabilisation branch.
+
 ## [0.9.0] - 2026-09-06
 
 First packaged release. No change to how the tool works — this makes it installable,
