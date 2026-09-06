@@ -1,0 +1,20 @@
+# uv / packaging
+.venv/
+dist/
+*.egg-info/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# tool caches
+.pytest_cache/
+.ruff_cache/
+.ty_cache/
+.coverage
+htmlcov/
+
+# imagegrid's own default output folder
+out/
+
+.DS_Store

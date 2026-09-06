@@ -1,0 +1,42 @@
+[project]
+name = "imagegrid"
+dynamic = ["version"]
+description = "Split a large image into print-ready tiles that print at exact 100% scale"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pillow>=10.0",
+    "reportlab>=4.0",
+    "rich>=13.0",
+    "typer>=0.12",
+]
+
+[project.scripts]
+imagegrid = "imagegrid.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "ty>=0.0.78",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ty.src]
+include = ["src", "tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/imagegrid/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/imagegrid"]
