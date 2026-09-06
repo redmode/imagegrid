@@ -44,10 +44,16 @@ def build(
     tmp_path.mkdir(parents=True, exist_ok=True)
     image = Image.new("RGB", px, "slategrey")
     plan = plan_layout(
-        width_px=px[0], height_px=px[1], dpi=50.0, dpi_source="test",
-        paper_mm=A4, margins=margins,
+        width_px=px[0],
+        height_px=px[1],
+        dpi=50.0,
+        dpi_source="test",
+        paper_mm=A4,
+        margins=margins,
         caption_strip_mm=CAPTION_STRIP_MM if caption else 0.0,
-        glue_flap_mm=glue_flap_mm, orientation=orientation, grid=grid,
+        glue_flap_mm=glue_flap_mm,
+        orientation=orientation,
+        grid=grid,
     )
     assert plan.fits, "the fixture layout must be printable"
     written = write_tiles(image, plan, tmp_path, stem, 90)
@@ -134,7 +140,10 @@ class TestCaptionPlacement:
     def test_the_caption_names_its_own_tile(self, tmp_path):
         _, pages, _ = build(tmp_path)
         assert [page.captions[0].text[:6] for page in pages] == [
-            "r01c01", "r01c02", "r02c01", "r02c02",
+            "r01c01",
+            "r01c02",
+            "r02c01",
+            "r02c02",
         ]
 
     def test_no_caption_when_the_strip_is_not_reserved(self, tmp_path):
@@ -237,7 +246,8 @@ class TestGlueFlapMarks:
         }
         return {
             name: [
-                ln for ln in page.lines
+                ln
+                for ln in page.lines
                 if matches(ln) and ((span(ln) > 20.0) == name.endswith("rule"))
             ]
             for name, matches in at.items()
@@ -278,13 +288,15 @@ class TestGlueFlapMarks:
         arms = [ln for ln in pages[0].lines if not ln.dashed]
         assert len(arms) == 8, "four corners of the piece, two arms each"
         corners = {
-            (round(min(ln.xs_mm) if ln.is_horizontal else ln.x0_mm, 1),
-             round(ln.y0_mm if ln.is_horizontal else min(ln.ys_mm), 1))
+            (
+                round(min(ln.xs_mm) if ln.is_horizontal else ln.x0_mm, 1),
+                round(ln.y0_mm if ln.is_horizontal else min(ln.ys_mm), 1),
+            )
             for ln in arms
         }
-        assert any(
-            abs(cy - (drawn.y_mm - GLUE_FLAP_MM)) < 6.0 for _, cy in corners
-        ), "arms reach down to the flap edge, not just the image edge"
+        assert any(abs(cy - (drawn.y_mm - GLUE_FLAP_MM)) < 6.0 for _, cy in corners), (
+            "arms reach down to the flap edge, not just the image edge"
+        )
 
     def test_the_marks_bracket_the_flap_corner(self, tmp_path):
         """The outer corner of the piece gets a real L, which is what a blade lines up on."""
@@ -298,8 +310,7 @@ class TestGlueFlapMarks:
             for ln in arms
         ), "a horizontal arm running out past the flap corner"
         assert any(
-            not ln.is_horizontal and abs(ln.x0_mm - corner_x) < 0.01
-            and min(ln.ys_mm) < corner_y
+            not ln.is_horizontal and abs(ln.x0_mm - corner_x) < 0.01 and min(ln.ys_mm) < corner_y
             for ln in arms
         ), "a vertical arm running down past the flap corner"
 
@@ -312,22 +323,22 @@ class TestGlueFlapMarks:
     def test_every_corner_arm_is_solid_once_the_rule_is_drawn(self, tmp_path):
         """Solid always means "the blade goes here"; only the rule carries the dashes."""
         _, pages, _ = build(tmp_path, grid=(2, 2), glue_flap_mm=GLUE_FLAP_MM)
-        short = [ln for ln in pages[0].lines
-                 if max(abs(ln.x1_mm - ln.x0_mm), abs(ln.y1_mm - ln.y0_mm)) <= 20.0]
+        short = [
+            ln
+            for ln in pages[0].lines
+            if max(abs(ln.x1_mm - ln.x0_mm), abs(ln.y1_mm - ln.y0_mm)) <= 20.0
+        ]
         assert len(short) == 8
         assert not any(ln.dashed for ln in short)
 
     def test_the_rule_always_prints_because_its_room_is_reserved(self, tmp_path):
         """A tile flush against the flap used to leave nowhere to draw the line."""
-        plan, pages, _ = build(
-            tmp_path, grid=None, px=(600, 1055), glue_flap_mm=GLUE_FLAP_MM
-        )
+        plan, pages, _ = build(tmp_path, grid=None, px=(600, 1055), glue_flap_mm=GLUE_FLAP_MM)
         room = plan.page.room_mm(plan.tile_width_mm, plan.tile_height_mm)
         assert room["bottom"] >= GLUE_FLAP_MM and room["right"] >= GLUE_FLAP_MM
         lines = self.edge_lines(pages[0])
         assert lines["bottom_rule"] and lines["right_rule"]
         assert lines["bottom_arm"] == [] and lines["right_arm"] == []
-
 
     def test_the_last_row_and_column_are_cut_not_glued(self, tmp_path):
         _, pages, _ = build(tmp_path, grid=(2, 2), glue_flap_mm=GLUE_FLAP_MM)
@@ -383,9 +394,15 @@ class TestNoRoomForMarks:
     def test_no_marks_are_drawn_and_a_warning_is_returned(self, tmp_path):
         image = Image.new("RGB", (374, 545), "slategrey")
         plan = plan_layout(
-            width_px=374, height_px=545, dpi=50.0, dpi_source="test",
-            paper_mm=A4, margins=UNIFORM, caption_strip_mm=0.0,
-            orientation=Orientation.portrait, grid=(1, 1),
+            width_px=374,
+            height_px=545,
+            dpi=50.0,
+            dpi_source="test",
+            paper_mm=A4,
+            margins=UNIFORM,
+            caption_strip_mm=0.0,
+            orientation=Orientation.portrait,
+            grid=(1, 1),
         )
         band_x, band_y = plan.page.band_mm(plan.tile_width_mm, plan.tile_height_mm)
         assert max(band_x, band_y) < 1.5, "the fixture must be tight on both axes"
@@ -407,9 +424,16 @@ class TestGuidePageText:
     def guide_page(self, tmp_path, **kwargs):
         image = Image.new("RGB", (600, 400), "slategrey")
         plan = plan_layout(
-            width_px=600, height_px=400, dpi=50.0, dpi_source="test", paper_mm=A4,
-            margins=UNIFORM, caption_strip_mm=CAPTION_STRIP_MM,
-            orientation=Orientation.portrait, grid=(2, 2), **kwargs,
+            width_px=600,
+            height_px=400,
+            dpi=50.0,
+            dpi_source="test",
+            paper_mm=A4,
+            margins=UNIFORM,
+            caption_strip_mm=CAPTION_STRIP_MM,
+            orientation=Orientation.portrait,
+            grid=(2, 2),
+            **kwargs,
         )
         written = write_tiles(image, plan, tmp_path, "g", 90)
         guide = tmp_path / "guide.png"
@@ -425,8 +449,7 @@ class TestGuidePageText:
         for caption in page.captions:
             assert caption.left_mm >= left - 1e-6
             assert caption.right_mm <= right + 1e-6, (
-                f"{caption.text!r} overruns the right margin by "
-                f"{caption.right_mm - right:.1f} mm"
+                f"{caption.text!r} overruns the right margin by {caption.right_mm - right:.1f} mm"
             )
 
     def test_the_legend_is_wrapped_rather_than_truncated(self, tmp_path):
@@ -461,9 +484,15 @@ class TestProbeSeesWholePdfs:
     def test_a_guide_page_is_not_mistaken_for_a_page_or_an_image(self, tmp_path):
         image = Image.new("RGB", (600, 400), "slategrey")
         plan = plan_layout(
-            width_px=600, height_px=400, dpi=50.0, dpi_source="test", paper_mm=A4,
-            margins=UNIFORM, caption_strip_mm=CAPTION_STRIP_MM,
-            orientation=Orientation.portrait, grid=(2, 2),
+            width_px=600,
+            height_px=400,
+            dpi=50.0,
+            dpi_source="test",
+            paper_mm=A4,
+            margins=UNIFORM,
+            caption_strip_mm=CAPTION_STRIP_MM,
+            orientation=Orientation.portrait,
+            grid=(2, 2),
         )
         written = write_tiles(image, plan, tmp_path, "g", 90)
         guide = tmp_path / "guide.png"
@@ -475,7 +504,10 @@ class TestProbeSeesWholePdfs:
         assert len(pages) == plan.sheet_count + 1 == 5
         assert [len(page.images) for page in pages[1:]] == [1, 1, 1, 1]
         assert [page.captions[0].text[:6] for page in pages[1:]] == [
-            "r01c01", "r01c02", "r02c01", "r02c02",
+            "r01c01",
+            "r01c02",
+            "r02c01",
+            "r02c02",
         ]
 
 

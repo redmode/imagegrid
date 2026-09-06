@@ -23,7 +23,6 @@ class Orientation(StrEnum):
     landscape = "landscape"
 
 
-
 def px_to_mm(px: float, dpi: float) -> float:
     return px / dpi * MM_PER_INCH
 

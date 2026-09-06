@@ -11,8 +11,12 @@ from imagegrid.units import PAPERS, Orientation
 
 def _plan(dpi: float):
     return plan_layout(
-        width_px=3937, height_px=3150, dpi=dpi, dpi_source="test",
-        paper_mm=PAPERS["a4"], margins=Margins.uniform(10.0),
+        width_px=3937,
+        height_px=3150,
+        dpi=dpi,
+        dpi_source="test",
+        paper_mm=PAPERS["a4"],
+        margins=Margins.uniform(10.0),
         orientation=Orientation.portrait,
     )
 

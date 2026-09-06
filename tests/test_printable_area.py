@@ -79,12 +79,8 @@ class TestMarkGeometry:
         This is what lets the function return a mark or nothing, with no third case: a
         band at the very threshold still yields a full millimetre of line.
         """
-        shortest = min(
-            mark_mm(MARK_MIN_SPACE_MM + step / 1000)[1] for step in range(0, 60_000)
-        )
-        assert shortest >= 1.0 - 1e-9, (
-            f"shortest arm is {shortest:.3f} mm — add a lower bound back"
-        )
+        shortest = min(mark_mm(MARK_MIN_SPACE_MM + step / 1000)[1] for step in range(0, 60_000))
+        assert shortest >= 1.0 - 1e-9, f"shortest arm is {shortest:.3f} mm — add a lower bound back"
 
 
 class TestPerSideMargins:
@@ -167,9 +163,14 @@ class TestReservedGlueFlap:
 
     def _plan(self, width_px: int, height_px: int, dpi: float, flap: float):
         return plan_layout(
-            width_px=width_px, height_px=height_px, dpi=dpi, dpi_source="t",
-            paper_mm=A4, margins=Margins.uniform(10.0),
-            caption_strip_mm=CAPTION_STRIP_MM, glue_flap_mm=flap,
+            width_px=width_px,
+            height_px=height_px,
+            dpi=dpi,
+            dpi_source="t",
+            paper_mm=A4,
+            margins=Margins.uniform(10.0),
+            caption_strip_mm=CAPTION_STRIP_MM,
+            glue_flap_mm=flap,
             orientation=Orientation.auto,
         )
 
@@ -242,9 +243,14 @@ class TestReservedCaptionStrip:
 
     def _plan(self, strip: float, margins: Margins | None = None):
         return plan_layout(
-            width_px=3937, height_px=3150, dpi=100.0, dpi_source="t",
-            paper_mm=A4, margins=margins or Margins.uniform(10.0),
-            caption_strip_mm=strip, orientation=Orientation.auto,
+            width_px=3937,
+            height_px=3150,
+            dpi=100.0,
+            dpi_source="t",
+            paper_mm=A4,
+            margins=margins or Margins.uniform(10.0),
+            caption_strip_mm=strip,
+            orientation=Orientation.auto,
         )
 
     def test_content_area_is_the_printable_area_less_the_strip(self):

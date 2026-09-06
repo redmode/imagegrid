@@ -43,10 +43,14 @@ def _plan(
     grid: tuple[int, int] | None = None,
 ) -> Plan:
     return plan_layout(
-        width_px=width_px, height_px=height_px, dpi=dpi,
-        dpi_source="test", paper_mm=paper_mm,
+        width_px=width_px,
+        height_px=height_px,
+        dpi=dpi,
+        dpi_source="test",
+        paper_mm=paper_mm,
         margins=margins if margins is not None else Margins.uniform(10.0),
-        orientation=orientation, grid=grid,
+        orientation=orientation,
+        grid=grid,
     )
 
 
@@ -176,12 +180,21 @@ class TestPlanArithmetic:
             _plan(margins=Margins.uniform(120.0))
 
 
-
 class TestUnits:
-    @pytest.mark.parametrize("text,expected", [
-        ("10mm", 10.0), ("10", 10.0), ("1cm", 10.0), ("1in", 25.4),
-        ("0.5in", 12.7), ('1"', 25.4), ("72pt", 25.4), (" 10 mm ", 10.0), ("10MM", 10.0),
-    ])
+    @pytest.mark.parametrize(
+        "text,expected",
+        [
+            ("10mm", 10.0),
+            ("10", 10.0),
+            ("1cm", 10.0),
+            ("1in", 25.4),
+            ("0.5in", 12.7),
+            ('1"', 25.4),
+            ("72pt", 25.4),
+            (" 10 mm ", 10.0),
+            ("10MM", 10.0),
+        ],
+    )
     def test_parse_length(self, text, expected):
         assert parse_length(text) == pytest.approx(expected)
 
@@ -225,9 +238,14 @@ class TestFitTolerance:
 
     def _plan(self, height_px: int):
         return plan_layout(
-            width_px=6142, height_px=height_px, dpi=120.0, dpi_source="test",
-            paper_mm=A4, margins=Margins.uniform(10.0),
-            orientation=Orientation.landscape, grid=(5, 5),
+            width_px=6142,
+            height_px=height_px,
+            dpi=120.0,
+            dpi_source="test",
+            paper_mm=A4,
+            margins=Margins.uniform(10.0),
+            orientation=Orientation.landscape,
+            grid=(5, 5),
         )
 
     def test_a_hundredth_of_a_millimetre_over_still_fits(self):

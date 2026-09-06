@@ -48,6 +48,8 @@ class Poster:
         return self.height_px / self.dpi * 25.4
 
 
+# fmt: off
+# The columns are a table: filename, width px, height px, dpi, why it is kept.
 POSTERS = (
     Poster(
         "poster_100x80cm.jpg", 1181, 945, 30.0,
@@ -70,6 +72,8 @@ POSTERS = (
         "sits a fraction inside a two-row fit, so reserving tips it to three",
     ),
 )
+
+# fmt: on
 
 SAMPLE = POSTERS[0]
 

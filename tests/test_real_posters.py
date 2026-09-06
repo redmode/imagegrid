@@ -22,10 +22,16 @@ MARGINS = Margins.uniform(10.0)
 
 def plan_for(poster, *, flap: float = GLUE_FLAP_MM, grid=None):
     return plan_layout(
-        width_px=poster.width_px, height_px=poster.height_px, dpi=poster.dpi,
-        dpi_source="fixture", paper_mm=PAPERS["a4"], margins=MARGINS,
-        caption_strip_mm=CAPTION_STRIP_MM, glue_flap_mm=flap,
-        orientation=Orientation.auto, grid=grid,
+        width_px=poster.width_px,
+        height_px=poster.height_px,
+        dpi=poster.dpi,
+        dpi_source="fixture",
+        paper_mm=PAPERS["a4"],
+        margins=MARGINS,
+        caption_strip_mm=CAPTION_STRIP_MM,
+        glue_flap_mm=flap,
+        orientation=Orientation.auto,
+        grid=grid,
     )
 
 
@@ -77,9 +83,7 @@ class TestEveryPosterPlans:
         assert page.content_height_mm == pytest.approx(
             page.printable_height_mm - CAPTION_STRIP_MM - page.flap_bottom_mm
         )
-        assert page.content_width_mm == pytest.approx(
-            page.printable_width_mm - page.flap_right_mm
-        )
+        assert page.content_width_mm == pytest.approx(page.printable_width_mm - page.flap_right_mm)
 
 
 class TestWhatTheFlapCosts:

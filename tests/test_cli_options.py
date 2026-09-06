@@ -215,8 +215,6 @@ class TestGlueFlapOption:
         assert result.exit_code == 0
         assert "Glue" not in result.output
 
-
-
     def test_a_negative_flap_is_rejected_by_the_parser(self, image):
         result = run(image, "--glue-flap", "-5mm", "--dry-run")
         assert result.exit_code == 1

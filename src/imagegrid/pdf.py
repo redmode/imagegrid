@@ -171,15 +171,19 @@ def _draw_crop_marks(pdf: canvas.Canvas, frame: CutFrame) -> bool:
             if horizontal is not None:  # arm level with the top/bottom edge
                 offset, length = horizontal
                 pdf.line(
-                    corner_x + dx * offset, corner_y,
-                    corner_x + dx * (offset + length), corner_y,
+                    corner_x + dx * offset,
+                    corner_y,
+                    corner_x + dx * (offset + length),
+                    corner_y,
                 )
                 drawn = True
             if vertical is not None:  # arm in line with the left/right edge
                 offset, length = vertical
                 pdf.line(
-                    corner_x, corner_y + dy * offset,
-                    corner_x, corner_y + dy * (offset + length),
+                    corner_x,
+                    corner_y + dy * offset,
+                    corner_x,
+                    corner_y + dy * (offset + length),
                 )
                 drawn = True
     pdf.restoreState()
@@ -288,9 +292,7 @@ def _draw_guide_page(
     image_top = page_height - top - GUIDE_IMAGE_TOP_DROP_PT
     image_bottom = bottom_margin + footer_height + GUIDE_FOOTER_GAP_PT
     available_height = image_top - image_bottom
-    scale = min(
-        available_width / plan.source_width_px, available_height / plan.source_height_px
-    )
+    scale = min(available_width / plan.source_width_px, available_height / plan.source_height_px)
     width, height = plan.source_width_px * scale, plan.source_height_px * scale
     pdf.drawImage(
         ImageReader(str(guide_png)),
@@ -331,9 +333,13 @@ def build_pdf(
         pdf.drawImage(ImageReader(str(path)), x, y, width=width, height=height)
 
         frame = cut_frame(
-            x, y, width, height,
+            x,
+            y,
+            width,
+            height,
             plan.page.room_mm(tile.width_mm, tile.height_mm),
-            plan.glue_flap_mm, _glue_edges(tile, plan),
+            plan.glue_flap_mm,
+            _glue_edges(tile, plan),
         )
         segments = flap_rule_segments(frame)
         _draw_flap_rule(pdf, segments)
@@ -342,7 +348,10 @@ def build_pdf(
         # The strip was reserved before the grid was chosen, so there is always room.
         if plan.page.caption_strip_mm > 0:
             _draw_label(
-                pdf, page_width, page_height, plan.page.margins,
+                pdf,
+                page_width,
+                page_height,
+                plan.page.margins,
                 _tile_caption(plan, tile, stem),
             )
         pdf.showPage()

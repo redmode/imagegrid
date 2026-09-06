@@ -166,9 +166,7 @@ def _from_exif(image: ImageMetadata) -> Resolution | None:
         return None
     if not exif:
         return None
-    density = _plausible_density(
-        (exif.get(_TAG_X_RESOLUTION), exif.get(_TAG_Y_RESOLUTION))
-    )
+    density = _plausible_density((exif.get(_TAG_X_RESOLUTION), exif.get(_TAG_Y_RESOLUTION)))
     if density is None:
         return None
     unit = exif.get(_TAG_RESOLUTION_UNIT, 2)

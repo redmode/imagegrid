@@ -108,9 +108,7 @@ class Margins:
     def __str__(self) -> str:
         if self.is_uniform:
             return f"margin {self.top:g} mm"
-        return (
-            f"margins t{self.top:g} r{self.right:g} b{self.bottom:g} l{self.left:g} mm"
-        )
+        return f"margins t{self.top:g} r{self.right:g} b{self.bottom:g} l{self.left:g} mm"
 
 
 @dataclass(frozen=True)
@@ -157,9 +155,7 @@ class Page:
             "bottom": band_y + self.flap_bottom_mm,
         }
 
-    def tile_origin_mm(
-        self, tile_width_mm: float, tile_height_mm: float
-    ) -> tuple[float, float]:
+    def tile_origin_mm(self, tile_width_mm: float, tile_height_mm: float) -> tuple[float, float]:
         """Bottom-left corner for a tile centred in the *content* area.
 
         Centring on the page instead would push image into the dead zone whenever the
@@ -279,9 +275,7 @@ def split_boundaries(total_px: int, parts: int) -> list[int]:
     return [round(i * total_px / parts) for i in range(parts + 1)]
 
 
-def build_tiles(
-    width_px: int, height_px: int, cols: int, rows: int, dpi: float
-) -> list[Tile]:
+def build_tiles(width_px: int, height_px: int, cols: int, rows: int, dpi: float) -> list[Tile]:
     """Build the full grid of tiles in reading order (row 1 left-to-right, then row 2...)."""
     xs = split_boundaries(width_px, cols)
     ys = split_boundaries(height_px, rows)
@@ -490,7 +484,4 @@ def _auto_fit_note(
         chosen_page.orientation
     ):
         return None
-    return (
-        f"auto-fit would use {cols}x{rows} = {cols * rows} tiles "
-        f"({best_page.orientation.value})"
-    )
+    return f"auto-fit would use {cols}x{rows} = {cols * rows} tiles ({best_page.orientation.value})"

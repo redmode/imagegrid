@@ -197,9 +197,7 @@ def _resolve_scale(
     else:
         width_mm = parse_length(width) if width is not None else None
         height_mm = parse_length(height) if height is not None else None
-    return dpi_for_print_size(
-        source.width, source.height, PrintSize(width_mm, height_mm)
-    )
+    return dpi_for_print_size(source.width, source.height, PrintSize(width_mm, height_mm))
 
 
 def _version_callback(value: bool) -> None:
@@ -259,68 +257,121 @@ def _write_outputs(
 
 @app.command()
 def split(
-    image: Annotated[Path, typer.Argument(
-        exists=True, dir_okay=False, readable=True, help="Image to split.")],
-    output: Annotated[Path | None, typer.Option(
-        "--output", "-o", help="Output directory.  [default: ./out/<image name>]")] = None,
-    grid: Annotated[str | None, typer.Option(
-        "--grid", "-g", metavar="COLSxROWS",
-        help="Force a grid, columns first, e.g. 4x5.  [default: auto-fit]")] = None,
-    paper: Annotated[str, typer.Option(
-        "--paper", "-p", help="Paper name (a4, a3, letter...) or a size like 210x297mm.")] = "a4",
-    orientation: Annotated[Orientation, typer.Option(
-        "--orientation", help="Page orientation.")] = Orientation.auto,
-    margin: Annotated[str, typer.Option(
-        "--margin", "-m", help="Unprintable border on all four sides.")] = "10mm",
-    margin_top: Annotated[str | None, typer.Option(
-        "--margin-top", help="Override --margin for the top edge.")] = None,
-    margin_right: Annotated[str | None, typer.Option(
-        "--margin-right", help="Override --margin for the right edge.")] = None,
-    margin_bottom: Annotated[str | None, typer.Option(
-        "--margin-bottom", help="Override --margin for the bottom edge.")] = None,
-    margin_left: Annotated[str | None, typer.Option(
-        "--margin-left", help="Override --margin for the left edge.")] = None,
-    dpi: Annotated[float | None, typer.Option(
-        "--dpi", help="Print at this resolution instead of the image's own.")] = None,
-    size: Annotated[str | None, typer.Option(
-        "--size", "-s", metavar="WxH",
-        help="Print at this finished size, e.g. 100x80cm. Aspect is preserved, so this "
-             "acts as a bounding box.")] = None,
-    width: Annotated[str | None, typer.Option(
-        "--width", help="Print this wide, e.g. 150cm; the height follows the aspect.")] = None,
-    height: Annotated[str | None, typer.Option(
-        "--height", help="Print this tall, e.g. 80cm; the width follows the aspect.")] = None,
-    quality: Annotated[int, typer.Option(
-        "--quality", "-q", min=1, max=100, help="JPEG quality.")] = 100,
-    keep_tiles: Annotated[bool, typer.Option(
-        "--tiles/--no-tiles",
-        help="Also write the individual tile images. The PDF already embeds them, so "
-             "they are only useful on their own.")] = False,
-    want_guide: Annotated[bool, typer.Option(
-        "--guide/--no-guide", help="Include the assembly guide as the PDF's first page.")] = True,
-    glue_flap: Annotated[str, typer.Option(
-        "--glue-flap", metavar="LENGTH",
-        help="Blank paper left on the bottom and right edges to glue under the next "
-             "sheet.")] = f"{GLUE_FLAP_MM:g}mm",
-    no_glue_flap: Annotated[bool, typer.Option(
-        "--no-glue-flap",
-        help="Cut every edge exactly, with no flap to glue.")] = False,
-    caption: Annotated[bool, typer.Option(
-        "--caption/--no-caption",
-        help="Label each sheet in the border. Reserves a strip, which can cost a sheet "
-             "or two on some images.")] = True,
-    dry_run: Annotated[bool, typer.Option(
-        "--dry-run", "-n", help="Show the plan and write nothing.")] = False,
-    version: Annotated[bool | None, typer.Option(
-        "--version", callback=_version_callback, is_eager=True,
-        help="Show the version and exit.")] = None,
+    image: Annotated[
+        Path, typer.Argument(exists=True, dir_okay=False, readable=True, help="Image to split.")
+    ],
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output directory.  [default: ./out/<image name>]"),
+    ] = None,
+    grid: Annotated[
+        str | None,
+        typer.Option(
+            "--grid",
+            "-g",
+            metavar="COLSxROWS",
+            help="Force a grid, columns first, e.g. 4x5.  [default: auto-fit]",
+        ),
+    ] = None,
+    paper: Annotated[
+        str,
+        typer.Option(
+            "--paper", "-p", help="Paper name (a4, a3, letter...) or a size like 210x297mm."
+        ),
+    ] = "a4",
+    orientation: Annotated[
+        Orientation, typer.Option("--orientation", help="Page orientation.")
+    ] = Orientation.auto,
+    margin: Annotated[
+        str, typer.Option("--margin", "-m", help="Unprintable border on all four sides.")
+    ] = "10mm",
+    margin_top: Annotated[
+        str | None, typer.Option("--margin-top", help="Override --margin for the top edge.")
+    ] = None,
+    margin_right: Annotated[
+        str | None, typer.Option("--margin-right", help="Override --margin for the right edge.")
+    ] = None,
+    margin_bottom: Annotated[
+        str | None, typer.Option("--margin-bottom", help="Override --margin for the bottom edge.")
+    ] = None,
+    margin_left: Annotated[
+        str | None, typer.Option("--margin-left", help="Override --margin for the left edge.")
+    ] = None,
+    dpi: Annotated[
+        float | None,
+        typer.Option("--dpi", help="Print at this resolution instead of the image's own."),
+    ] = None,
+    size: Annotated[
+        str | None,
+        typer.Option(
+            "--size",
+            "-s",
+            metavar="WxH",
+            help="Print at this finished size, e.g. 100x80cm. Aspect is preserved, so this "
+            "acts as a bounding box.",
+        ),
+    ] = None,
+    width: Annotated[
+        str | None,
+        typer.Option("--width", help="Print this wide, e.g. 150cm; the height follows the aspect."),
+    ] = None,
+    height: Annotated[
+        str | None,
+        typer.Option("--height", help="Print this tall, e.g. 80cm; the width follows the aspect."),
+    ] = None,
+    quality: Annotated[
+        int, typer.Option("--quality", "-q", min=1, max=100, help="JPEG quality.")
+    ] = 100,
+    keep_tiles: Annotated[
+        bool,
+        typer.Option(
+            "--tiles/--no-tiles",
+            help="Also write the individual tile images. The PDF already embeds them, so "
+            "they are only useful on their own.",
+        ),
+    ] = False,
+    want_guide: Annotated[
+        bool,
+        typer.Option(
+            "--guide/--no-guide", help="Include the assembly guide as the PDF's first page."
+        ),
+    ] = True,
+    glue_flap: Annotated[
+        str,
+        typer.Option(
+            "--glue-flap",
+            metavar="LENGTH",
+            help="Blank paper left on the bottom and right edges to glue under the next sheet.",
+        ),
+    ] = f"{GLUE_FLAP_MM:g}mm",
+    no_glue_flap: Annotated[
+        bool, typer.Option("--no-glue-flap", help="Cut every edge exactly, with no flap to glue.")
+    ] = False,
+    caption: Annotated[
+        bool,
+        typer.Option(
+            "--caption/--no-caption",
+            help="Label each sheet in the border. Reserves a strip, which can cost a sheet "
+            "or two on some images.",
+        ),
+    ] = True,
+    dry_run: Annotated[
+        bool, typer.Option("--dry-run", "-n", help="Show the plan and write nothing.")
+    ] = False,
+    version: Annotated[
+        bool | None,
+        typer.Option(
+            "--version",
+            callback=_version_callback,
+            is_eager=True,
+            help="Show the version and exit.",
+        ),
+    ] = None,
 ) -> None:
     """Split IMAGE into a grid of tiles, each sized to print on one sheet at 100% scale."""
     try:
         paper_mm = parse_paper(paper)
-        margins = _resolve_margins(
-            margin, margin_top, margin_right, margin_bottom, margin_left
-        )
+        margins = _resolve_margins(margin, margin_top, margin_right, margin_bottom, margin_left)
         grid_spec = parse_grid(grid) if grid else None
         glue_flap_mm = 0.0 if no_glue_flap else parse_length(glue_flap)
     except (UnitError, LayoutError) as exc:

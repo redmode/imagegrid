@@ -59,8 +59,6 @@ class TestDefaultOutputs:
         assert tiles, "--tiles must write the images"
         assert (out / "sample_print.pdf").exists(), "and still write the PDF"
 
-
-
     def test_tile_dpi_note_only_appears_with_tiles(self, small_image, tmp_path):
         """A 50 dpi image printed 33 cm wide lands on a fractional dpi."""
         quiet = run(small_image, tmp_path / "q", "--width", "33cm", "--dry-run")

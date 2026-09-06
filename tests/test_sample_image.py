@@ -32,9 +32,13 @@ SAMPLE_HEIGHT_MM = SAMPLE.height_mm
 def _plan(image, *, grid: tuple[int, int] | None = (4, 5)):
     res = resolve_dpi(image)
     return plan_layout(
-        width_px=image.width, height_px=image.height,
-        dpi=res.dpi, dpi_source=res.source,
-        paper_mm=PAPERS["a4"], margins=Margins.uniform(10.0), grid=grid,
+        width_px=image.width,
+        height_px=image.height,
+        dpi=res.dpi,
+        dpi_source=res.source,
+        paper_mm=PAPERS["a4"],
+        margins=Margins.uniform(10.0),
+        grid=grid,
     )
 
 
@@ -73,9 +77,13 @@ class TestPlanningTheSample:
         """
         from_file = _plan(sample_image)
         from_literals = plan_layout(
-            width_px=SAMPLE_WIDTH_PX, height_px=SAMPLE_HEIGHT_PX, dpi=SAMPLE_DPI,
-            dpi_source="literal", paper_mm=PAPERS["a4"],
-            margins=Margins.uniform(10.0), grid=(4, 5),
+            width_px=SAMPLE_WIDTH_PX,
+            height_px=SAMPLE_HEIGHT_PX,
+            dpi=SAMPLE_DPI,
+            dpi_source="literal",
+            paper_mm=PAPERS["a4"],
+            margins=Margins.uniform(10.0),
+            grid=(4, 5),
         )
         assert (from_file.cols, from_file.rows) == (from_literals.cols, from_literals.rows)
         assert from_file.page == from_literals.page
@@ -179,8 +187,13 @@ class TestGuideFont:
         monkeypatch.setattr(tiles, "_FONT_CANDIDATES", ("/no/such/font.ttf",))
         image = Image.new("RGB", (800, 400), "seagreen")
         plan = plan_layout(
-            width_px=800, height_px=400, dpi=100.0, dpi_source="test",
-            paper_mm=PAPERS["a4"], margins=Margins.uniform(10.0), grid=(2, 1),
+            width_px=800,
+            height_px=400,
+            dpi=100.0,
+            dpi_source="test",
+            paper_mm=PAPERS["a4"],
+            margins=Margins.uniform(10.0),
+            grid=(2, 1),
         )
         guide = tiles.guide_image(image, plan, max_px=400)
         assert guide.size == (400, 200), "a missing font must not stop the guide rendering"
@@ -198,8 +211,13 @@ class TestColourProfile:
         image = Image.open(source)
         image.load()
         plan = plan_layout(
-            width_px=image.width, height_px=image.height, dpi=100.0, dpi_source="test",
-            paper_mm=PAPERS["a4"], margins=Margins.uniform(10.0), grid=(2, 1),
+            width_px=image.width,
+            height_px=image.height,
+            dpi=100.0,
+            dpi_source="test",
+            paper_mm=PAPERS["a4"],
+            margins=Margins.uniform(10.0),
+            grid=(2, 1),
         )
         for _, path in write_tiles(image, plan, tmp_path, "tagged", 90):
             assert Image.open(path).info.get("icc_profile"), f"{path.name} lost its profile"
