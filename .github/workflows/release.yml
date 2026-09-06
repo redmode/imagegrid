@@ -1,0 +1,96 @@
+name: Release
+
+# Publishes a GitHub release with the built sdist and wheel attached.
+# PyPI publishing is deliberately not wired up yet — the artifacts this builds are
+# already PyPI-valid, so enabling it later is an additive change. See RELEASING.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Read package version
+        id: version
+        run: |
+          version=$(uv run --no-project python -c \
+            "import re,pathlib; print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('src/imagegrid/__init__.py').read_text()).group(1))")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "package version: $version"
+
+      - name: Tag must match the package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$tag" != "${{ steps.version.outputs.version }}" ]; then
+            echo "::error::tag v$tag does not match __version__ ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+      - name: Changelog must have an entry for this version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: grep -q "^## \[${{ steps.version.outputs.version }}\]" CHANGELOG.md
+
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run ty check
+      - run: uv run pytest -q
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      # Not published anywhere yet, but kept green so the metadata stays PyPI-ready.
+      - name: Check metadata renders on PyPI
+        run: uvx twine check --strict dist/*
+
+      - name: Smoke test the built wheel
+        run: |
+          uv venv /tmp/smoke
+          VIRTUAL_ENV=/tmp/smoke uv pip install dist/*.whl
+          /tmp/smoke/bin/imagegrid --version
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  github-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes_flag=--generate-notes
+          if grep -q '^## \[${{ needs.build.outputs.version }}\]' CHANGELOG.md; then
+            awk '/^## \[${{ needs.build.outputs.version }}\]/{f=1;next} /^## \[/{f=0} f' \
+              CHANGELOG.md > /tmp/notes.md
+            if [ -s /tmp/notes.md ]; then notes_flag="--notes-file=/tmp/notes.md"; fi
+          fi
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$GITHUB_REF_NAME" \
+            "$notes_flag"

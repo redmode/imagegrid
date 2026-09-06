@@ -168,7 +168,7 @@ wheels = [
 ]
 
 [[package]]
-name = "imagegrid"
+name = "imagegrid-cli"
 source = { editable = "." }
 dependencies = [
     { name = "pillow" },

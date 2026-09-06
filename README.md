@@ -34,8 +34,17 @@ Output  out/poster_100x80cm
 ## Install
 
 ```bash
-brew install uv
-uv tool install .          # system-wide `imagegrid`
+uv tool install git+https://github.com/redmode/imagegrid@v0.9.0
+```
+
+That gives you a system-wide `imagegrid` command. Drop the `@v0.9.0` to track the latest
+`main`, or run `uv tool install .` from a checkout to install your working copy.
+
+Not on PyPI yet — that comes once the command-line interface settles. Each tagged release
+also attaches a built wheel you can install directly:
+
+```bash
+uv tool install https://github.com/redmode/imagegrid/releases/download/v0.9.0/imagegrid_cli-0.9.0-py3-none-any.whl
 ```
 
 If the shim is not found afterwards, run `uv tool update-shell` once and open a new

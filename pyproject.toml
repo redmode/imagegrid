@@ -1,15 +1,39 @@
 [project]
-name = "imagegrid"
+name = "imagegrid-cli"
 dynamic = ["version"]
 description = "Split a large image into print-ready tiles that print at exact 100% scale"
 readme = "README.md"
 requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Alexander Gedranovich", email = "gedranovich@gmail.com" }]
+keywords = ["poster", "printing", "tiles", "pdf", "dpi", "image", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "Topic :: Printing",
+    "Typing :: Typed",
+]
 dependencies = [
     "pillow>=10.0",
     "reportlab>=4.0",
     "rich>=13.0",
     "typer>=0.12",
 ]
+
+[project.urls]
+Homepage = "https://github.com/redmode/imagegrid"
+Repository = "https://github.com/redmode/imagegrid"
+Issues = "https://github.com/redmode/imagegrid/issues"
+Changelog = "https://github.com/redmode/imagegrid/blob/main/CHANGELOG.md"
 
 [project.scripts]
 imagegrid = "imagegrid.cli:app"
@@ -32,7 +56,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 include = ["src", "tests"]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -40,3 +64,7 @@ path = "src/imagegrid/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/imagegrid"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "CHANGELOG.md", "LICENSE", "pyproject.toml"]
+exclude = ["tests/fixtures"]
