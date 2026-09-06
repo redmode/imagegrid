@@ -37,18 +37,15 @@ Output  out/poster_100x80cm
 ## Install
 
 ```bash
-uv tool install git+https://github.com/redmode/imagegrid@v0.9.0
+uv tool install git+https://github.com/redmode/imagegrid
 ```
 
-That gives you a system-wide `imagegrid` command. Drop the `@v0.9.0` to track the latest
-`main`, or run `uv tool install .` from a checkout to install your working copy.
+That gives you a system-wide `imagegrid` command. Append `@vX.Y.Z` to pin a particular
+release, or run `uv tool install .` from a checkout to install your working copy.
 
-Not on PyPI yet — that comes once the command-line interface settles. Each tagged release
-also attaches a built wheel you can install directly:
-
-```bash
-uv tool install https://github.com/redmode/imagegrid/releases/download/v0.9.0/imagegrid_cli-0.9.0-py3-none-any.whl
-```
+Not on PyPI yet — that comes once the command-line interface settles. Every release also
+attaches a built wheel, on the
+[releases page](https://github.com/redmode/imagegrid/releases/latest).
 
 If the shim is not found afterwards, run `uv tool update-shell` once and open a new
 shell — uv installs to `~/.local/bin`.
@@ -66,9 +63,9 @@ uv run ty check            # type check
 
 Add dependencies with `uv add <pkg>` rather than `pip install`, so `uv.lock` stays honest.
 
-CI runs all four on Linux, macOS and Windows across Python 3.11 to 3.14. Releases are cut
-as git tags — see [RELEASING.md](RELEASING.md), and [CHANGELOG.md](CHANGELOG.md) for what
-changed when.
+CI runs the test suite on Linux, macOS and Windows across Python 3.11 to 3.14; the lint,
+format and type checks run once, on Linux. Releases are cut as git tags — see
+[RELEASING.md](RELEASING.md), and [CHANGELOG.md](CHANGELOG.md) for what changed when.
 
 ## Usage
 
@@ -118,7 +115,8 @@ the bottom in either orientation.
 If a printed sheet comes out clipped, the margin is set smaller than your printer's real
 dead zone; raise it.
 
-Every sheet is labelled in its top border (`r02c03 · 250.0 × 160.0 mm · col 3/4 row 2/5`).
+Every sheet is labelled in its top border (`r02c03 · 250.0 x 160.0 mm · col 3/4 row 2/5`,
+followed by the glue edges and the source file's name).
 A 5 mm strip is reserved for that label **before** the grid is chosen, because auto-fit
 maximises the tile to minimise sheets and would otherwise consume it — raising the bottom
 margin does not help, it shrinks the leftover space instead. Reserving is usually free; on

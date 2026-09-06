@@ -14,6 +14,20 @@ Releases are cut as git tags; see [RELEASING.md](RELEASING.md).
 - `RELEASING.md` now documents how work reaches a release: the trunk-based branching
   model, where changelog entries are written, how to choose the version number, and why a
   release branch is a chore branch rather than a stabilisation branch.
+- Docstrings for `_fail`, `_plan_table`, `_fit_verdict`, `_fit_advice`, `Resolution`,
+  `_from_exif`, `_draw_flap_rule` and `_tile_caption`, whose immediate siblings all had
+  one.
+
+### Fixed
+
+- The README, `RELEASING.md` and this file all claimed the lint, format and type checks
+  run across the whole platform matrix. Only the test suite does; the other three run once,
+  on Linux.
+- The install instructions pinned `v0.9.0` in three places, so they would have gone stale
+  at the next release. They now track the repository, mention `@vX.Y.Z` for pinning, and
+  link to the releases page rather than a versioned wheel URL.
+- The example sheet caption in the README used a `×` where the code emits an ASCII `x`,
+  and omitted the source file name that the caption also carries.
 
 ## [0.9.0] - 2026-09-06
 
@@ -24,9 +38,9 @@ testable on every supported platform, and releasable from a tag.
 
 - Complete package metadata: MIT `LICENSE`, authors, keywords, classifiers and project
   URLs, so the build is publishable as-is.
-- Continuous integration on Linux, macOS and Windows across Python 3.11 to 3.14, running
-  `ruff check`, `ruff format --check`, `ty` and the test suite, plus a build check that
-  validates the artifacts and smoke-tests the wheel in a clean virtualenv.
+- Continuous integration: the test suite on Linux, macOS and Windows across Python 3.11 to
+  3.14, plus `ruff check`, `ruff format --check`, `ty` and a build check that validates the
+  artifacts and smoke-tests the wheel in a clean virtualenv.
 - A release workflow: pushing a `vX.Y.Z` tag verifies the tag matches `__version__` and
   that this file has a section for it, runs the full suite, builds the sdist and wheel,
   and publishes a GitHub release with both attached.

@@ -146,8 +146,9 @@ git commit -am "Release X.Y.Z"
 gh pr create --fill
 ```
 
-Opening the PR runs CI: ruff, ruff format, ty, and the test suite on Linux, macOS and
-Windows across Python 3.11 through 3.14, plus a build check. When it is green:
+Opening the PR runs CI: the test suite on Linux, macOS and Windows across Python 3.11
+through 3.14, plus ruff, ruff format, ty and a build check once each on Linux — fourteen
+checks in all. When they are green:
 
 ```bash
 gh pr merge --squash
