@@ -1,5 +1,7 @@
 # imagegrid
 
+[![CI](https://github.com/redmode/imagegrid/actions/workflows/ci.yml/badge.svg)](https://github.com/redmode/imagegrid/actions/workflows/ci.yml)
+
 Split a large image into a grid of tiles, each sized to print on a single sheet at
 **exact 100% scale**, then glue the pieces back together into a full-size poster.
 
@@ -12,7 +14,8 @@ Source  1181x945 px @ 30 dpi (JFIF)  ->  999.9 x 800.1 mm
 Paper   297x210 mm landscape, margin 10 mm  ->  printable 277 x 190 mm (less 5 mm for captions)
 Grid    4 columns x 5 rows = 20 tiles (auto-fit would use 6x3 = 18 tiles (portrait))
 Tile    295x189 px  ->  250.0 x 160.0 mm    fits, 22.0 x 20.0 mm to spare
-Glue    5 mm flap on the bottom and right edges (reserved before the grid)
+Glue    5 mm flap on the bottom and right edges  (reserved before the grid, so its cut line always prints)
+Input   tests/fixtures/poster_100x80cm.jpg
 Output  out/poster_100x80cm
 ```
 
@@ -57,10 +60,15 @@ uv sync                    # creates ./.venv from pyproject.toml + uv.lock
 uv run imagegrid --help
 uv run pytest -q
 uv run ruff check .        # lint; --fix applies the safe ones
+uv run ruff format .       # formatter; CI checks this, so run it before pushing
 uv run ty check            # type check
 ```
 
 Add dependencies with `uv add <pkg>` rather than `pip install`, so `uv.lock` stays honest.
+
+CI runs all four on Linux, macOS and Windows across Python 3.11 to 3.14. Releases are cut
+as git tags — see [RELEASING.md](RELEASING.md), and [CHANGELOG.md](CHANGELOG.md) for what
+changed when.
 
 ## Usage
 
@@ -87,6 +95,7 @@ imagegrid IMAGE [OPTIONS]
       --glue-flap LENGTH   Blank flap on the bottom/right edges  [5mm]
       --no-glue-flap       Cut every edge exactly, with no flap
   -n, --dry-run            Show the plan and write nothing
+      --version            Show the version and exit
 ```
 
 Lengths accept `mm`, `cm`, `in`, `"` and `pt`; a bare number means millimetres.
@@ -149,7 +158,7 @@ solid all round. Assembly runs from `r01c01`, each new sheet laying **on top** o
 of the one before.
 
 The flap is blank rather than a duplicate of the neighbour's pixels, so the visible seam is
-still an exact butt joint and the finished poster keeps the size the plan promised. It is
+still an exact butt joint and the finished poster keeps the size the plan promised.
 `--no-glue-flap` returns to cutting every edge exactly, and gives the reserved space back
 to the image.
 
@@ -213,3 +222,7 @@ out/poster_100x80cm/
 2. Check one sheet with a ruler before printing the rest.
 3. Cut each sheet on its corner marks.
 4. Lay the pieces out using the guide page and butt them edge to edge.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
