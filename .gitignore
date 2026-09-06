@@ -18,3 +18,6 @@ htmlcov/
 out/
 
 .DS_Store
+
+# editor / workspace
+*.code-workspace
