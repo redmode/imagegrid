@@ -48,11 +48,13 @@ TILE_DPI_DRIFT_THRESHOLD_MM = 0.5
 
 
 def _fail(message: str) -> NoReturn:
+    """Report a user-facing error on stderr and exit non-zero."""
     err_console.print(f"[bold red]error[/]  {message}")
     raise typer.Exit(code=1)
 
 
 def _plan_table(plan: Plan, image_path: Path, out_dir: Path, dry_run: bool = False) -> Table:
+    """The plan as printed before any work: every number the run depends on, in one place."""
     table = Table(show_header=False, box=None, pad_edge=False, padding=(0, 2, 0, 0))
     table.add_column(style="bold cyan", no_wrap=True)
     table.add_column()
@@ -104,6 +106,7 @@ def _plan_table(plan: Plan, image_path: Path, out_dir: Path, dry_run: bool = Fal
 
 
 def _fit_verdict(plan: Plan) -> str:
+    """Whether the tile fits its sheet, with the room to spare or the overflow in mm."""
     if plan.fits:
         spare_x, spare_y = plan.spare_mm
         return f"[green]fits[/], {max(0.0, spare_x):.1f} x {max(0.0, spare_y):.1f} mm to spare"
@@ -140,6 +143,7 @@ def _tile_dpi_warning(plan: Plan) -> str | None:
 
 
 def _fit_advice(plan: Plan) -> str:
+    """What to change when the requested grid does not fit — shown alongside the error."""
     other = (
         Orientation.landscape
         if plan.page.orientation is Orientation.portrait

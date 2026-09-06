@@ -50,6 +50,8 @@ class ResolutionError(ValueError):
 
 @dataclass(frozen=True)
 class Resolution:
+    """A resolved print resolution, and where it came from."""
+
     dpi: float
     source: str  # human-readable provenance, shown in the plan table
     note: str | None = None  # e.g. how a requested print size was reconciled
@@ -160,6 +162,7 @@ def _from_info_dpi(image: ImageMetadata) -> Resolution | None:
 
 
 def _from_exif(image: ImageMetadata) -> Resolution | None:
+    """EXIF resolution tags — the last resort, and the only source recording its own unit."""
     try:
         exif = image.getexif()
     except Exception:  # a corrupt EXIF block should not sink the run

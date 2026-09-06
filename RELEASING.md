@@ -21,6 +21,106 @@ unrelated package last released in 2018. The import package and the installed co
 both `imagegrid`; only the distribution name differs, and it is visible only at install
 time.
 
+## How work reaches a release
+
+`main` is the trunk. It is the only long-lived branch, it must be releasable at every
+commit, and it is what people install from — so every merge into it goes through a pull
+request and has to pass the full check matrix. There is no separate `develop`: `main` is
+the last release plus everything merged since.
+
+This is enforced, not just conventional. `main` is protected: all fourteen checks must
+pass, the branch must be up to date before merging, history stays linear, and force-pushes
+and deletions are refused. Reviews are not required, so you can merge your own pull
+requests.
+
+What has been *released* is carried by **tags**, not by any branch. Immediately after a
+release the tag and `main` point at the same commit; they diverge as the next features
+land, and converge again at the next cut.
+
+### Working on a feature
+
+```bash
+git switch main && git pull
+git switch -c feat/tile-overlap
+```
+
+Build it, with tests. **Add the changelog line in the same pull request**, under
+`## [Unreleased]`:
+
+```markdown
+## [Unreleased]
+
+### Added
+
+- `--overlap LENGTH` for printers that cannot butt-join cleanly.
+```
+
+Then open a pull request, let the checks run, merge, and delete the branch. Do not touch
+`__version__` — it stays at the last released number until a release is cut.
+
+Use `feat/` for new behaviour, `fix/` for bug fixes, `docs/` or `chore/` for the rest. The
+prefix is a convention, not something enforced.
+
+### Accumulating
+
+Several features later, `## [Unreleased]` has written itself:
+
+```markdown
+## [Unreleased]
+
+### Added
+
+- `--overlap LENGTH` for printers that cannot butt-join cleanly.
+- `--preview` writes a single contact-sheet PNG of the planned layout.
+
+### Fixed
+
+- A2 was missing from the paper size table.
+```
+
+That section is the whole reason releases are cheap: it is written while the work is fresh,
+and the release workflow feeds it straight to `gh release create --notes-file`. The release
+notes are what you wrote as you went, not something reconstructed from commit messages
+afterwards.
+
+### Deciding to cut
+
+When the accumulated set is worth someone's attention — there is no required cadence — cut
+a release, following [Cutting a release](#cutting-a-release) below.
+
+`release/X.Y.Z` is a **chore branch, not a stabilisation branch**. In git-flow you cut a
+release branch and then harden it for days while development continues elsewhere. Here
+there is nothing to harden: `main` was already green, so the branch carries two mechanical
+edits, lives for the length of one pull request, and is deleted. If you find yourself
+fixing bugs on a release branch, something went wrong upstream; fix it on `main` and cut
+again.
+
+### Choosing the number
+
+Read `## [Unreleased]`:
+
+| It contains | Bump | Example |
+| --- | --- | --- |
+| anything under `Added` or `Changed` | minor | `0.9.0` -> `0.10.0` |
+| only `Fixed` | patch | `0.9.0` -> `0.9.1` |
+
+Before 1.0, a breaking change is allowed in a minor bump — that is what the leading zero
+buys. Say so plainly in the changelog when it happens.
+
+### Patching an older release
+
+Not needed yet, and worth avoiding until it is. If a released version needs a fix while
+`main` has already moved on, branch from the **tag** rather than from `main`:
+
+```bash
+git switch -c release/0.9.x v0.9.0
+# fix, bump to 0.9.1, tag v0.9.1
+```
+
+then bring the fix forward to `main` with `git cherry-pick`. This is the one case where a
+release branch is long-lived, and it only becomes worth the cost once people are running
+more than one version.
+
 ## Cutting a release
 
 Everything happens on a short-lived branch off `main`. The tag goes on `main` after the
@@ -34,16 +134,21 @@ git switch -c release/X.Y.Z
 On the branch, make exactly these edits:
 
 1. Bump `__version__` in `src/imagegrid/__init__.py`.
-2. In `CHANGELOG.md`, move the `## [Unreleased]` items under a new
-   `## [X.Y.Z] - YYYY-MM-DD` heading, and update the link definitions at the bottom.
+2. In `CHANGELOG.md`, rename the `## [Unreleased]` heading to `## [X.Y.Z] - YYYY-MM-DD`,
+   add a fresh empty `## [Unreleased]` above it, and update the link definitions at the
+   bottom of the file. Nothing else moves — the entries were written as the work landed.
+
+Nothing else belongs on this branch. If a fix is needed, it goes to `main` as its own pull
+request first.
 
 ```bash
 git commit -am "Release X.Y.Z"
 gh pr create --fill
 ```
 
-Opening the PR runs CI: ruff, ruff format, ty, and the test suite on Linux, macOS and
-Windows across Python 3.11 through 3.14, plus a build check. When it is green:
+Opening the PR runs CI: the test suite on Linux, macOS and Windows across Python 3.11
+through 3.14, plus ruff, ruff format, ty and a build check once each on Linux — fourteen
+checks in all. When they are green:
 
 ```bash
 gh pr merge --squash

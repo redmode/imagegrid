@@ -95,6 +95,7 @@ def flap_rule_segments(frame: CutFrame) -> list[tuple[float, float, float, float
 
 
 def _draw_flap_rule(pdf: canvas.Canvas, segments: list[tuple[float, float, float, float]]) -> None:
+    """Stroke the flap cut line as a dashed rule, so it reads as "cut here", not as art."""
     if not segments:
         return
     pdf.saveState()
@@ -203,6 +204,7 @@ def _draw_label(
 
 
 def _tile_caption(plan: Plan, tile: Tile, stem: str) -> str:
+    """The sheet's label: which piece it is, its size, its glue edges, and where it came from."""
     parts = [
         tile.label,
         f"{tile.width_mm:.1f} x {tile.height_mm:.1f} mm",
